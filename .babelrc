@@ -1,0 +1,7 @@
+{
+	"presets": ["es2015"],
+	"plugins": [
+	  ["remove-comments"],
+	  ["inline-json-import", {}]
+	]
+}
