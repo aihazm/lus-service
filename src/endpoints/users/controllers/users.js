@@ -38,7 +38,7 @@ export default {
 				if ( docs.length > 0 ) {
 					resolve( {
 						status: 409,
-						message: `User with name ${request.params.user} already exists`
+						message: `User with name ${request.body.name} already exists`
 					} );
 				} else {
 					db.insert( request.body, function ( err, doc ) {
@@ -51,7 +51,7 @@ export default {
 						}
 						resolve( {
 							status: 200,
-							message: `Users with name ${request.params.user} has been successfully created`
+							message: `Users with name ${request.body.name} has been successfully created`
 						} );
 					} );
 				}
