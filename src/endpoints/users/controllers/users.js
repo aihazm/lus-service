@@ -34,26 +34,44 @@ export default {
 					message: "Bad request!"
 				} );
 			}
+			function insert(){
+				db.insert( request.body, function ( err, doc ) {
+					console.log( "Inserted", JSON.stringify( doc ), "with ID", doc._id );
+					if ( err ) {
+						reject( {
+							status: 500,
+							message: err
+						} );
+					}
+					resolve( {
+						status: 200,
+						message: `Users with name ${request.body.name} has been successfully created`
+					} );
+				} );
+			}
+
 			db.find( {name: request.body.name} ).exec( function ( err, docs ) {
-				if ( docs.length > 0 ) {
+				if ( docs.length > 0 && !( request.query && request.query.hasOwnProperty( "replace" ) )) {
 					resolve( {
 						status: 409,
 						message: `User with name ${request.body.name} already exists`
 					} );
 				} else {
-					db.insert( request.body, function ( err, doc ) {
-						console.log( "Inserted", JSON.stringify( doc ), "with ID", doc._id );
-						if ( err ) {
-							reject( {
-								status: 500,
-								message: err
-							} );
-						}
-						resolve( {
-							status: 200,
-							message: `Users with name ${request.body.name} has been successfully created`
+					if ( docs.length > 0 && request.query && request.query.hasOwnProperty( "replace" ) ) { //update
+						db.remove( {name: request.body.name}, {multi: true}, function ( err, nbrRemoved ) {
+							console.log( "removed", request.body.name );
+							if ( err ) {
+								reject( {
+									status: 500,
+									message: err
+								} );
+							}
+							insert();
 						} );
-					} );
+					} else {
+						insert();
+					}
+
 				}
 			} );
 		} );
